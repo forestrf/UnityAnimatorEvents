@@ -1,0 +1,7 @@
+/Library/
+/Logs/
+/Temp/
+/.vs/
+*.csproj
+*.sln
+/obj/
