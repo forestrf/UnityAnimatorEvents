@@ -9,7 +9,13 @@ public class AnimatorEventSMB : StateMachineBehaviourExtended {
 	public TimedEvent[] onNormalizedTimeReached;
 	public TimedEvent[] onStateUpdated; // onStateUpdated instead of onStateUpdate because of a naming error. In the future it can be changed to onStateUpdate
 
-	[NonSerialized] public AnimatorEvent animatorEvent; // Initialized by AnimatorEvent.Awake
+	private AnimatorEvent _animatorEvent;
+	private AnimatorEvent GetAnimatorEvent(Animator animator) {
+		if (_animatorEvent == null) {
+			_animatorEvent = animator.GetComponent<AnimatorEvent>();
+		}
+		return _animatorEvent;
+	}
 
 	[Serializable]
 	public struct TimedEvent {
@@ -23,24 +29,24 @@ public class AnimatorEventSMB : StateMachineBehaviourExtended {
 	}
 
 	public override void StateEnter_TransitionStarts(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-		FireTimedEvents(onStateEnterTransitionStart);
+		FireTimedEvents(animator, onStateEnterTransitionStart);
 	}
 
 	public override void StateEnter_TransitionEnds(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-		FireTimedEvents(onStateEnterTransitionEnd);
+		FireTimedEvents(animator, onStateEnterTransitionEnd);
 	}
 
 	public override void StateExit_TransitionStarts(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-		FireTimedEvents(onStateExitTransitionStart);
+		FireTimedEvents(animator, onStateExitTransitionStart);
 	}
 
 	public override void StateExit_TransitionEnds(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-		FireTimedEvents(onStateExitTransitionEnd);
+		FireTimedEvents(animator, onStateExitTransitionEnd);
 
 		// Finalize events that want to execute on end, and reset them for later
 		for (int i = 0; i < onNormalizedTimeReached.Length; i++) {
 			if (onNormalizedTimeReached[i].executeOnExitEnds && onNormalizedTimeReached[i].nextNormalizedTime == 0) {
-				animatorEvent.CallEvent(onNormalizedTimeReached[i].callback);
+				GetAnimatorEvent(animator).CallEvent(onNormalizedTimeReached[i].callback);
 			}
 			onNormalizedTimeReached[i].nextNormalizedTime = 0;
 		}
@@ -48,11 +54,11 @@ public class AnimatorEventSMB : StateMachineBehaviourExtended {
 
 	public override void StateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
 		for (int i = 0; i < onStateUpdated.Length; i++) {
-			animatorEvent.CallEvent(onStateUpdated[i].callback);
+			GetAnimatorEvent(animator).CallEvent(onStateUpdated[i].callback);
 		}
 		for (int i = 0; i < onNormalizedTimeReached.Length; i++) {
 			if (stateInfo.normalizedTime >= onNormalizedTimeReached[i].normalizedTime + onNormalizedTimeReached[i].nextNormalizedTime) {
-				animatorEvent.CallEvent(onNormalizedTimeReached[i].callback);
+				GetAnimatorEvent(animator).CallEvent(onNormalizedTimeReached[i].callback);
 				if (onNormalizedTimeReached[i].repeat)
 					onNormalizedTimeReached[i].nextNormalizedTime++;
 				else
@@ -61,8 +67,8 @@ public class AnimatorEventSMB : StateMachineBehaviourExtended {
 		}
 	}
 
-	private void FireTimedEvents(TimedEvent[] events) {
+	private void FireTimedEvents(Animator animator, TimedEvent[] events) {
 		for (int i = 0; i < events.Length; i++)
-			animatorEvent.CallEvent(events[i].callback);
+			GetAnimatorEvent(animator).CallEvent(events[i].callback);
 	}
 }

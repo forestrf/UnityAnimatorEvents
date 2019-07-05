@@ -29,11 +29,6 @@ public class AnimatorEvent : MonoBehaviour {
 		elementsDict = new Dictionary<string, EventElement>();
 		foreach (var elem in events)
 			elementsDict.Add(elem.name, elem);
-
-		// Initialize references in SMBs
-		foreach (var smb in GetComponent<Animator>().GetBehaviours<AnimatorEventSMB>()) {
-			smb.animatorEvent = this;
-		}
 	}
 
 	private void LateUpdate() {
