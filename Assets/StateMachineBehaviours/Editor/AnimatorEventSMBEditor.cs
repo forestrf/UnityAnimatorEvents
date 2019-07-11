@@ -29,7 +29,9 @@ public class AnimatorEventSMBEditor : Editor {
 			serializedObject.Update();
 			serializedObject.ApplyModifiedProperties();
 			foreach (var ae in FindObjectsOfType<AnimatorEvent>()) {
-				if (ae.GetComponent<Animator>().runtimeAnimatorController == c.animatorController) {
+				var runtimeController = ae.GetComponent<Animator>().runtimeAnimatorController;
+				var overrided = runtimeController as AnimatorOverrideController;
+				if (runtimeController == c.animatorController || (overrided != null && overrided.runtimeAnimatorController == c.animatorController)) {
 					matchingAnimatorEvent.Add(ae);
 					foreach (var ev in ae.events) {
 						if (!eventsAvailable.Contains(ev.name)) {
