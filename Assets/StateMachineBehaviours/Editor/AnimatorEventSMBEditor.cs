@@ -25,7 +25,6 @@ public class AnimatorEventSMBEditor : Editor {
 	private void InitializeIfNeeded() {
 		if (controller != null) return;
 		
-		matchingAnimatorEvent.Clear();
 		contexts = UnityEditor.Animations.AnimatorController.FindStateMachineBehaviourContext((AnimatorEventSMB) target);
 
 		Type animatorWindowType = Type.GetType("UnityEditor.Graphs.AnimatorControllerTool, UnityEditor.Graphs");
@@ -36,31 +35,7 @@ public class AnimatorEventSMBEditor : Editor {
 		controller = controllerField.GetValue(window) as UnityEditor.Animations.AnimatorController;
 
 
-
-		serializedObject.Update();
-		serializedObject.ApplyModifiedProperties();
-		foreach (var ae in FindObjectsOfType<AnimatorEvent>()) {
-			var runtimeController = ae.GetComponent<Animator>().runtimeAnimatorController;
-			var overrided = runtimeController as AnimatorOverrideController;
-			if (runtimeController == controller || (overrided != null && overrided.runtimeAnimatorController == controller)) {
-				matchingAnimatorEvent.Add(ae);
-
-
-				List<int> sortedEventIndices = new List<int>();
-				for (int i = 0; i < ae.events.Length; i++) {
-					sortedEventIndices.Add(i);
-				}
-				sortedEventIndices.Sort((a, b) => ae.events[a].name.CompareTo(ae.events[b].name));
-
-
-				foreach (var i in sortedEventIndices) {
-					var ev = ae.events[i];
-					if (!eventsAvailable.Contains(ev.id)) {
-						eventsAvailable.Add(ev.id);
-					}
-				}
-			}
-		}
+		UpdateMatchingAnimatorEventList();
 
 		CreateReorderableList("On State Enter Transition Start", 20, ref list_onStateEnterTransitionStart, serializedObject.FindProperty("onStateEnterTransitionStart"),
 			(rect, index, isActive, isFocused) => {
@@ -96,6 +71,8 @@ public class AnimatorEventSMBEditor : Editor {
 				float timeNow = property.FindPropertyRelative("normalizedTime").floatValue;
 
 				if (timeBefore != timeNow) {
+					UpdateMatchingAnimatorEventList();
+
 					if (!AnimationMode.InAnimationMode())
 						AnimationMode.StartAnimationMode();
 
@@ -114,6 +91,40 @@ public class AnimatorEventSMBEditor : Editor {
 					}
 				}
 			});
+	}
+
+	void UpdateMatchingAnimatorEventList() {
+		var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+		AnimatorEvent[] animatorEvents;
+		if (prefabStage != null) {
+			animatorEvents = prefabStage.stageHandle.FindComponentsOfType<AnimatorEvent>();
+		}
+		else {
+			animatorEvents = FindObjectsOfType<AnimatorEvent>();
+		}
+		matchingAnimatorEvent.Clear();
+		foreach (var ae in animatorEvents) {
+			var runtimeController = ae.GetComponent<Animator>().runtimeAnimatorController;
+			var overrided = runtimeController as AnimatorOverrideController;
+			if (runtimeController == controller || (overrided != null && overrided.runtimeAnimatorController == controller)) {
+				matchingAnimatorEvent.Add(ae);
+
+
+				List<int> sortedEventIndices = new List<int>();
+				for (int i = 0; i < ae.events.Length; i++) {
+					sortedEventIndices.Add(i);
+				}
+				sortedEventIndices.Sort((a, b) => ae.events[a].name.CompareTo(ae.events[b].name));
+
+
+				foreach (var i in sortedEventIndices) {
+					var ev = ae.events[i];
+					if (!eventsAvailable.Contains(ev.id)) {
+						eventsAvailable.Add(ev.id);
+					}
+				}
+			}
+		}
 	}
 
 	private AnimationClip GetFirstAvailableClip(Motion motion) {
