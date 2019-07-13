@@ -12,23 +12,26 @@ public class AnimatorEvent : MonoBehaviour {
 	// Instead of executing events inmediately, we wait for the animator to play the animation for this frame
 	// This will prevent being one frame ahead, with the character's old pose from the previous animation
 	private List<EventElement> queuedEvents;
-	private Dictionary<string, EventElement> elementsDict;
+	/// <summary>
+	/// Events stored by its id. The id of an <see cref="EventElement"/> doesn't change after it's allocated.
+	/// </summary>
+	private Dictionary<int, EventElement> elementsDict;
 
-	public void CallEvent(string eventName) {
+	public void CallEvent(int id) {
 #if UNITY_EDITOR
-		if (debug) Debug.Log("Event: " + eventName);
+		if (debug) Debug.Log("Event id: " + id);
 #endif
-		if (elementsDict.TryGetValue(eventName, out EventElement ev))
+		if (elementsDict.TryGetValue(id, out EventElement ev))
 			queuedEvents.Add(ev);
 		else
-			Debug.LogError("Event [" + eventName + "] not found", this);
+			Debug.LogError("Event id [" + id + "] not found", this);
 	}
 
 	void Awake() {
 		queuedEvents = new List<EventElement>();
-		elementsDict = new Dictionary<string, EventElement>();
+		elementsDict = new Dictionary<int, EventElement>();
 		foreach (var elem in events)
-			elementsDict.Add(elem.name, elem);
+			elementsDict.Add(elem.id, elem);
 	}
 
 	private void LateUpdate() {
@@ -38,9 +41,17 @@ public class AnimatorEvent : MonoBehaviour {
 		queuedEvents.Clear();
 	}
 
+	public EventElement GetEventById(int id) {
+		foreach (var elem in events)
+			if (elem.id == id)
+				return elem;
+		return null;
+	}
+
 	[Serializable]
 	public class EventElement {
 		public string name;
+		public int id;
 		public UnityEvent action;
 	}
 }

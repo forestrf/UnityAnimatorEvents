@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEditorInternal;
@@ -15,34 +16,50 @@ public class AnimatorEventSMBEditor : Editor {
 	private ReorderableList list_onNormalizedTimeReached;
 	private ReorderableList list_onStateUpdated;
 
-	private readonly List<string> eventsAvailable = new List<string>();
+	private readonly List<int> eventsAvailable = new List<int>();
 	private readonly List<AnimatorEvent> matchingAnimatorEvent = new List<AnimatorEvent>();
 	private StateMachineBehaviourContext[] contexts;
 
+	private UnityEditor.Animations.AnimatorController controller;
+
 	private void InitializeIfNeeded() {
-		if (contexts != null) return;
+		if (controller != null) return;
 		
 		matchingAnimatorEvent.Clear();
 		contexts = UnityEditor.Animations.AnimatorController.FindStateMachineBehaviourContext((AnimatorEventSMB) target);
-		if (contexts.Length > 0) {
-			var c = contexts[0];
-			serializedObject.Update();
-			serializedObject.ApplyModifiedProperties();
-			foreach (var ae in FindObjectsOfType<AnimatorEvent>()) {
-				var runtimeController = ae.GetComponent<Animator>().runtimeAnimatorController;
-				var overrided = runtimeController as AnimatorOverrideController;
-				if (runtimeController == c.animatorController || (overrided != null && overrided.runtimeAnimatorController == c.animatorController)) {
-					matchingAnimatorEvent.Add(ae);
-					foreach (var ev in ae.events) {
-						if (!eventsAvailable.Contains(ev.name)) {
-							eventsAvailable.Add(ev.name);
-						}
+
+		Type animatorWindowType = Type.GetType("UnityEditor.Graphs.AnimatorControllerTool, UnityEditor.Graphs");
+		var window = EditorWindow.GetWindow(animatorWindowType);
+		//var animatorField = animatorWindowType.GetField("m_PreviewAnimator", BindingFlags.Instance | BindingFlags.NonPublic);
+		//animator = animatorField.GetValue(window) as Animator;
+		var controllerField = animatorWindowType.GetField("m_AnimatorController", BindingFlags.Instance | BindingFlags.NonPublic);
+		controller = controllerField.GetValue(window) as UnityEditor.Animations.AnimatorController;
+
+
+
+		serializedObject.Update();
+		serializedObject.ApplyModifiedProperties();
+		foreach (var ae in FindObjectsOfType<AnimatorEvent>()) {
+			var runtimeController = ae.GetComponent<Animator>().runtimeAnimatorController;
+			var overrided = runtimeController as AnimatorOverrideController;
+			if (runtimeController == controller || (overrided != null && overrided.runtimeAnimatorController == controller)) {
+				matchingAnimatorEvent.Add(ae);
+
+
+				List<int> sortedEventIndices = new List<int>();
+				for (int i = 0; i < ae.events.Length; i++) {
+					sortedEventIndices.Add(i);
+				}
+				sortedEventIndices.Sort((a, b) => ae.events[a].name.CompareTo(ae.events[b].name));
+
+
+				foreach (var i in sortedEventIndices) {
+					var ev = ae.events[i];
+					if (!eventsAvailable.Contains(ev.id)) {
+						eventsAvailable.Add(ev.id);
 					}
 				}
 			}
-
-			eventsAvailable.Sort();
-			//eventsAvailable.Add("New event");
 		}
 
 		CreateReorderableList("On State Enter Transition Start", 20, ref list_onStateEnterTransitionStart, serializedObject.FindProperty("onStateEnterTransitionStart"),
@@ -123,14 +140,22 @@ public class AnimatorEventSMBEditor : Editor {
 
 	private void DrawCallbackField(Rect rect, SerializedProperty property) {
 		var callbackProperty = property.FindPropertyRelative("callback");
-		float buttonWidth = 100;
-		if (GUI.Button(new Rect(rect.x, rect.y, buttonWidth, 18), "View events")) {
-			var windowEventViewer = EditorWindow.GetWindow<EventViewerWindow>();
-			windowEventViewer.SetTarget(this, callbackProperty.stringValue);
-			windowEventViewer.Show();
+		var callbackIdProperty = property.FindPropertyRelative("callbackId");
+		if (callbackIdProperty.intValue == 0) {
+			callbackIdProperty.intValue = Animator.StringToHash(callbackProperty.stringValue);
 		}
-		float space = 10;
-		EditorGUI.PropertyField(new Rect(rect.x + buttonWidth + space, rect.y, rect.width - buttonWidth - space, 18), callbackProperty, GUIContent.none);
+		float idWidth = 120;
+		var ev = matchingAnimatorEvent[0].GetEventById(callbackIdProperty.intValue);
+		if (ev != null) {
+			GUI.Label(new Rect(rect.x, rect.y, rect.width - idWidth, 18), ev.name);
+			var tmp = EditorGUIUtility.labelWidth;
+			EditorGUIUtility.labelWidth = 20;
+			EditorGUI.IntField(new Rect(rect.x + rect.width - idWidth, rect.y, idWidth, 18), new GUIContent("ID:", "ID of the event. Change it manually only if needed."), callbackIdProperty.intValue);
+			EditorGUIUtility.labelWidth = tmp;
+		}
+		else {
+			GUI.Label(new Rect(rect.x, rect.y, rect.width - idWidth, 18), "- EVENT NOT FOUND -");
+		}
 	}
 
 	private void CreateReorderableList(string title, int height, ref ReorderableList reorderableList, SerializedProperty soList, ReorderableList.ElementCallbackDelegate drawCallback) {
@@ -141,13 +166,16 @@ public class AnimatorEventSMBEditor : Editor {
 		};
 		reorderableList.drawElementCallback = drawCallback;
 		reorderableList.onAddDropdownCallback = (buttonRect, list) => {
+			if (matchingAnimatorEvent.Count == 0) return;
+
 			var menu = new GenericMenu();
 			for (int i = 0; i < eventsAvailable.Count; i++) {
-				menu.AddItem(new GUIContent(eventsAvailable[i]),
+				int j = i;
+				menu.AddItem(new GUIContent(matchingAnimatorEvent[0].GetEventById(eventsAvailable[i]).name),
 				false, (data) => {
 					serializedObject.Update();
 					soList.InsertArrayElementAtIndex(soList.arraySize);
-					soList.GetArrayElementAtIndex(soList.arraySize - 1).FindPropertyRelative("callback").stringValue = data as string;
+					soList.GetArrayElementAtIndex(soList.arraySize - 1).FindPropertyRelative("callbackId").intValue = eventsAvailable[j];
 					serializedObject.ApplyModifiedProperties();
 				}, eventsAvailable[i]);
 			}
@@ -163,7 +191,7 @@ public class AnimatorEventSMBEditor : Editor {
 		if (Application.isPlaying) GUI.enabled = false;
 
 		serializedObject.Update();
-		
+
 		list_onStateEnterTransitionStart.DoLayoutList();
 		list_onStateEnterTransitionEnd.DoLayoutList();
 		list_onStateExitTransitionStart.DoLayoutList();
@@ -179,59 +207,5 @@ public class AnimatorEventSMBEditor : Editor {
 	private void OnDestroy() {
 		if (AnimationMode.InAnimationMode())
 			AnimationMode.StopAnimationMode();
-	}
-
-
-
-	public class EventViewerWindow : EditorWindow {
-		AnimatorEventSMBEditor animatorEventSMBEditor;
-		string callbackName;
-
-		private void OnEnable() {
-			minSize = new Vector2(320, 170);
-		}
-
-		public void SetTarget(AnimatorEventSMBEditor animatorEventSMBEditor, string callbackName) {
-			this.animatorEventSMBEditor = animatorEventSMBEditor;
-			this.callbackName = callbackName;
-		}
-
-		Vector2 scrollPos;
-
-		void OnGUI() {
-			GUILayout.Label("Events for callback \"" + callbackName + "\"", EditorStyles.boldLabel);
-
-			scrollPos = GUILayout.BeginScrollView(scrollPos, false, false);
-			foreach (var ae in animatorEventSMBEditor.matchingAnimatorEvent) {
-				GUILayout.BeginVertical("box");
-
-				GUILayout.BeginHorizontal();
-				GUILayout.Label("GameObject ", EditorStyles.boldLabel);
-				GUI.enabled = false;
-				EditorGUILayout.ObjectField(ae.gameObject, typeof(GameObject), true);
-				GUI.enabled = true;
-				GUILayout.EndHorizontal();
-
-				var index = GetEventIndex(ae, callbackName);
-				if (index == -1) {
-					GUILayout.Label("Event not found");
-				}
-				else {
-					var so = new SerializedObject(ae);
-					EditorGUILayout.PropertyField(so.FindProperty("events").GetArrayElementAtIndex(index).FindPropertyRelative("action"), true);
-				}
-				GUILayout.EndVertical();
-			}
-			GUILayout.EndScrollView();
-		}
-
-		int GetEventIndex(AnimatorEvent ae, string eventName) {
-			for (int i = 0; i < ae.events.Length; i++) {
-				if (ae.events[i].name == eventName) {
-					return i;
-				}
-			}
-			return -1;
-		}
 	}
 }
