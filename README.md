@@ -19,8 +19,8 @@ The events can (only) be triggered by 5 type of triggers:
 - Entering a state, just when the transition to it ends
 - Exiting a state, just when the transition from it starts
 - Exiting a state, just when the transition from it ends
-- At a specific point in time while playing a state, either every time the state loops or only the first time, and also in case of exiting the state if it hasn't be triggered yet.
+- At a specific point in time when playing a state. It can be repeated every time the sate loops. It can also fire the trigger in case the animator leaves the state before the specific point in time.
 
-For the last type of trigger, an slider is provided to help pinpoint the exact time for the trigger to happen by previsualizing the animation. This feature doesn't work with blendtrees, only showing the preview for the first animation without blending it with the others.
+For the last type of trigger, a slider is provided to help pinpoint the exact time for the trigger to happen by previsualizing the animation. This feature doesn't work with blendtrees, only showing the preview for the first animation without blending it with the others.
 
 You can change the name of an event at any point because it is referenced by an integer ID, not by its name. You can also type the character '/' in the event name to organize the events in a hierarchy like folders, by adding as many `/` as needed.
