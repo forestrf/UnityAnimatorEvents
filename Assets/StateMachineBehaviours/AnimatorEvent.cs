@@ -5,17 +5,17 @@ using UnityEngine.Events;
 
 [RequireComponent(typeof(Animator))]
 public class AnimatorEvent : MonoBehaviour {
-	public EventElement[] events;
+	public EventElement[] events = new EventElement[0];
 	[Tooltip("Debug.Log calls to events. Only works in the Editor")]
 	public bool debug = false;
 
 	// Instead of executing events inmediately, we wait for the animator to play the animation for this frame
 	// This will prevent being one frame ahead, with the character's old pose from the previous animation
-	private List<EventElement> queuedEvents;
+	private List<EventElement> queuedEvents = new List<EventElement>();
 	/// <summary>
 	/// Events stored by its id. The id of an <see cref="EventElement"/> doesn't change after it's allocated.
 	/// </summary>
-	private Dictionary<int, EventElement> elementsDict;
+	private Dictionary<int, EventElement> elementsDict = new Dictionary<int, EventElement>();
 
 	public void CallEvent(int id) {
 #if UNITY_EDITOR
@@ -28,8 +28,6 @@ public class AnimatorEvent : MonoBehaviour {
 	}
 
 	void Awake() {
-		queuedEvents = new List<EventElement>();
-		elementsDict = new Dictionary<int, EventElement>();
 		foreach (var elem in events)
 			elementsDict.Add(elem.id, elem);
 	}
