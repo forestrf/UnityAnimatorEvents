@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEditor;
-using UnityEditor.Animations;
 using UnityEditorInternal;
 using UnityEngine;
 
@@ -72,14 +69,19 @@ public class AnimatorEventSMBEditor : Editor {
 	}
 
 	void UpdateMatchingAnimatorEventList() {
-		var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
 		AnimatorEvent[] animatorEvents;
+#if UNITY_2018_0 || UNITY_2018_1 || UNITY_2018_2 || UNITY_2017 || UNITY_5
+		animatorEvents = FindObjectsOfType<AnimatorEvent>();
+#else
+		var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
 		if (prefabStage != null) {
 			animatorEvents = prefabStage.stageHandle.FindComponentsOfType<AnimatorEvent>();
 		}
 		else {
 			animatorEvents = FindObjectsOfType<AnimatorEvent>();
 		}
+#endif
+
 		matchingAnimatorEvent.Clear();
 		foreach (var ae in animatorEvents) {
 			var runtimeController = ae.GetComponent<Animator>().runtimeAnimatorController;
