@@ -23,6 +23,7 @@ public class SetParamSMB : StateMachineBehaviourExtended {
 	public AnimationCurve curve;
 
 	// Variables used by OnNormalizedTimeReached and WhileUpdating
+	[Tooltip("Enable this to allow executing the logic every time the state loops. Otherwise it will only happen once.")]
 	public bool repeat;
 
 
