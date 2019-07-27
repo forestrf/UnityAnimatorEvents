@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731713, g: 0.13414736, b: 0.12107852, a: 1}
+  m_IndirectSpecularColor: {r: 0.3731193, g: 0.38073996, b: 0.35872698, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -227,6 +227,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   events:
   - name: 1
+    id: -2082672713
     action:
       m_PersistentCalls:
         m_Calls:
@@ -244,6 +245,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 2
+    id: 450215437
     action:
       m_PersistentCalls:
         m_Calls:
@@ -261,6 +263,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 3
+    id: 1842515611
     action:
       m_PersistentCalls:
         m_Calls:
@@ -278,6 +281,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 4
+    id: -206169288
     action:
       m_PersistentCalls:
         m_Calls:
@@ -295,6 +299,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 5
+    id: -2068763730
     action:
       m_PersistentCalls:
         m_Calls:
@@ -312,6 +317,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 6
+    id: 498629140
     action:
       m_PersistentCalls:
         m_Calls:
@@ -329,6 +335,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 7
+    id: 1790921346
     action:
       m_PersistentCalls:
         m_Calls:
@@ -346,6 +353,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 8
+    id: -100641005
     action:
       m_PersistentCalls:
         m_Calls:
@@ -363,6 +371,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 9
+    id: -1928894587
     action:
       m_PersistentCalls:
         m_Calls:
@@ -380,6 +389,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 10
+    id: -1587730975
     action:
       m_PersistentCalls:
         m_Calls:
@@ -397,6 +407,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 11
+    id: -698739337
     action:
       m_PersistentCalls:
         m_Calls:
@@ -414,6 +425,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 12
+    id: 1330857165
     action:
       m_PersistentCalls:
         m_Calls:
@@ -431,6 +443,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 13
+    id: 945058907
     action:
       m_PersistentCalls:
         m_Calls:
@@ -448,6 +461,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 14
+    id: -1506745864
     action:
       m_PersistentCalls:
         m_Calls:
@@ -465,6 +479,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 15
+    id: -784871058
     action:
       m_PersistentCalls:
         m_Calls:
@@ -482,6 +497,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 16
+    id: 1212055764
     action:
       m_PersistentCalls:
         m_Calls:
@@ -499,6 +515,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 17
+    id: 1060745282
     action:
       m_PersistentCalls:
         m_Calls:
@@ -516,6 +533,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 18
+    id: -1350128173
     action:
       m_PersistentCalls:
         m_Calls:
@@ -533,6 +551,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 19
+    id: -662594235
     action:
       m_PersistentCalls:
         m_Calls:
@@ -550,6 +569,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
   - name: 20
+    id: -1972341214
     action:
       m_PersistentCalls:
         m_Calls:
@@ -566,6 +586,7 @@ MonoBehaviour:
           m_CallState: 2
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
+  debug: 0
 --- !u!95 &1753905104
 Animator:
   serializedVersion: 3
