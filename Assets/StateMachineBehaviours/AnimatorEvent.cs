@@ -21,7 +21,8 @@ public class AnimatorEvent : MonoBehaviour {
 #if UNITY_EDITOR
 		if (debug) Debug.Log("Event id: " + id);
 #endif
-		if (elementsDict.TryGetValue(id, out EventElement ev))
+		EventElement ev;
+		if (elementsDict.TryGetValue(id, out ev))
 			queuedEvents.Add(ev);
 		else
 			Debug.LogError("Event id [" + id + "] not found", this);

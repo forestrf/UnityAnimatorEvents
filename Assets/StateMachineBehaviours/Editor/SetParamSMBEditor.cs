@@ -16,7 +16,8 @@ public class SetParamSMBEditor : Editor {
 		var paramName = serializedObject.FindProperty("paramName");
 
 		if (null == animatorController) {
-			ScrubAnimatorUtil.GetCurrentAnimatorAndController(out animatorController, out var _);
+			Animator ignore;
+			ScrubAnimatorUtil.GetCurrentAnimatorAndController(out animatorController, out ignore);
 		}
 		var parameters = animatorController.parameters;
 

@@ -30,7 +30,8 @@ public class AnimatorEventSMBEditor : Editor {
 			eventNameStyle.richText = true;
 		}
 
-		ScrubAnimatorUtil.GetCurrentAnimatorAndController(out controller, out var _);
+		Animator ignore;
+		ScrubAnimatorUtil.GetCurrentAnimatorAndController(out controller, out ignore);
 
 		UpdateMatchingAnimatorEventList();
 

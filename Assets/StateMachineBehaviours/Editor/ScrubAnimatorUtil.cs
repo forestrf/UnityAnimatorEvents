@@ -42,7 +42,9 @@ public static class ScrubAnimatorUtil {
 			if (!AnimationMode.InAnimationMode())
 				AnimationMode.StartAnimationMode();
 
-			GetCurrentAnimatorAndController(out var _, out Animator animator);
+			AnimatorController ignore;
+			Animator animator;
+			GetCurrentAnimatorAndController(out ignore, out animator);
 
 			var contexts = AnimatorController.FindStateMachineBehaviourContext(target);
 

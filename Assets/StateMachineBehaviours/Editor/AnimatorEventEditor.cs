@@ -133,7 +133,8 @@ public class AnimatorEventEditor : Editor {
 	}
 
 	bool Get(string text) {
-		if (!hierarchyExpanded.TryGetValue(text, out var state)) {
+		bool state;
+		if (!hierarchyExpanded.TryGetValue(text, out state)) {
 			hierarchyExpanded.Add(text, false);
 		}
 		return state;
