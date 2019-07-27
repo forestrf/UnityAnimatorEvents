@@ -74,16 +74,22 @@ public class AnimatorEventEditor : Editor {
 							EditorGUILayout.BeginVertical("box");
 							EditorGUI.BeginChangeCheck();
 							EditorGUILayout.BeginHorizontal();
-							string originalName = property.FindPropertyRelative("name").stringValue;
-							property.FindPropertyRelative("name").stringValue = EditorGUILayout.DelayedTextField(originalName);
-							bool remove = GUILayout.Button("Remove");
+							var prevLabelWidth = EditorGUIUtility.labelWidth;
+							EditorGUIUtility.labelWidth = 60;
+							EditorGUILayout.DelayedTextField(property.FindPropertyRelative("name"));
+							bool remove = GUILayout.Button("Remove", GUILayout.Width(100));
 							EditorGUILayout.EndHorizontal();
 							if (EditorGUI.EndChangeCheck()) {
 								CalculatedSortedIndices();
 							}
 							EditorGUILayout.PropertyField(property.FindPropertyRelative("action"), true);
 							GUI.skin.label.alignment = TextAnchor.UpperRight;
-							GUILayout.Label("ID: " + property.FindPropertyRelative("id").intValue);
+							EditorGUILayout.BeginHorizontal();
+							GUILayout.Label(""); // align this to the right, then the property will also be aligned to the rigth. Hack because idk how to align the proprety to the right
+							EditorGUIUtility.labelWidth = 40;
+							EditorGUILayout.PropertyField(property.FindPropertyRelative("id"), new GUIContent("ID ", "ID of the event. Change it manually only if needed."), GUILayout.Width(140));
+							EditorGUIUtility.labelWidth = prevLabelWidth;
+							EditorGUILayout.EndHorizontal();
 							GUI.skin.label.alignment = TextAnchor.UpperLeft;
 							EditorGUILayout.EndVertical();
 

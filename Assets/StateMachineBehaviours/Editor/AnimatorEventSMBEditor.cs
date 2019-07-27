@@ -22,9 +22,16 @@ public class AnimatorEventSMBEditor : Editor {
 
 	private UnityEditor.Animations.AnimatorController controller;
 
+	private static GUIStyle eventNameStyle;
+
 	private void InitializeIfNeeded() {
 		if (controller != null) return;
-		
+
+		if (eventNameStyle == null) {
+			eventNameStyle = GUI.skin.label;
+			eventNameStyle.richText = true;
+		}
+
 		contexts = UnityEditor.Animations.AnimatorController.FindStateMachineBehaviourContext((AnimatorEventSMB) target);
 
 		Type animatorWindowType = Type.GetType("UnityEditor.Graphs.AnimatorControllerTool, UnityEditor.Graphs");
@@ -155,18 +162,13 @@ public class AnimatorEventSMBEditor : Editor {
 		if (callbackIdProperty.intValue == 0) {
 			callbackIdProperty.intValue = Animator.StringToHash(callbackProperty.stringValue);
 		}
-		float idWidth = 120;
 		var ev = matchingAnimatorEvent[0].GetEventById(callbackIdProperty.intValue);
-		if (ev != null) {
-			GUI.Label(new Rect(rect.x, rect.y, rect.width - idWidth, 18), ev.name);
-			var tmp = EditorGUIUtility.labelWidth;
-			EditorGUIUtility.labelWidth = 20;
-			EditorGUI.IntField(new Rect(rect.x + rect.width - idWidth, rect.y, idWidth, 18), new GUIContent("ID:", "ID of the event. Change it manually only if needed."), callbackIdProperty.intValue);
-			EditorGUIUtility.labelWidth = tmp;
-		}
-		else {
-			GUI.Label(new Rect(rect.x, rect.y, rect.width - idWidth, 18), "- EVENT NOT FOUND -");
-		}
+		float idWidth = 120;
+		GUI.Label(new Rect(rect.x, rect.y, rect.width - idWidth, 18), ev != null ? ev.name : "<color=red><b>EVENT ID NOT FOUND</b></color>");
+		var prevLabelWidth = EditorGUIUtility.labelWidth;
+		EditorGUIUtility.labelWidth = 20;
+		EditorGUI.PropertyField(new Rect(rect.x + rect.width - idWidth, rect.y, idWidth, 18), callbackIdProperty, new GUIContent("ID ", "ID of the event. Change it manually only if needed."));
+		EditorGUIUtility.labelWidth = prevLabelWidth;
 	}
 
 	private void CreateReorderableList(string title, int height, ref ReorderableList reorderableList, SerializedProperty soList, ReorderableList.ElementCallbackDelegate drawCallback) {
