@@ -63,21 +63,27 @@ public static class ScrubAnimatorUtil {
 	}
 
 	private static AnimationClip GetFirstAvailableClip(Motion motion) {
-		if (motion is AnimationClip clip)
+		AnimationClip clip = motion as AnimationClip;
+		if (clip != null)
 			return clip;
 
-		if (motion is BlendTree tree) {
+		BlendTree tree = motion as BlendTree;
+		if (tree != null) {
 			foreach (ChildMotion childMotion in tree.children) {
 				// Should we be worried about `cycleOffset`? https://docs.unity3d.com/ScriptReference/Animations.AnimatorState-cycleOffset.html
 
 				var child = childMotion.motion;
-				if (child is BlendTree childBlendTree) {
-					var childClip = GetFirstAvailableClip(childBlendTree);
+				BlendTree childTree = child as BlendTree;
+				if (childTree != null) {
+					var childClip = GetFirstAvailableClip(childTree);
 					if (childClip != null)
 						return childClip;
 				}
-				else if (child is AnimationClip childClip)
-					return childClip;
+				else {
+					AnimationClip childClip = child as AnimationClip;
+					if (childClip != null)
+						return childClip;
+				}
 			}
 		}
 
