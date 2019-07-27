@@ -5,7 +5,6 @@ using UnityEditor;
 using UnityEditor.Animations;
 using UnityEditorInternal;
 using UnityEngine;
-using BlendTree = UnityEditor.Animations.BlendTree;
 
 [CustomEditor(typeof(AnimatorEventSMB))]
 public class AnimatorEventSMBEditor : Editor {
@@ -18,7 +17,6 @@ public class AnimatorEventSMBEditor : Editor {
 
 	private readonly List<int> eventsAvailable = new List<int>();
 	private readonly List<AnimatorEvent> matchingAnimatorEvent = new List<AnimatorEvent>();
-	private StateMachineBehaviourContext[] contexts;
 
 	private UnityEditor.Animations.AnimatorController controller;
 
@@ -32,15 +30,7 @@ public class AnimatorEventSMBEditor : Editor {
 			eventNameStyle.richText = true;
 		}
 
-		contexts = UnityEditor.Animations.AnimatorController.FindStateMachineBehaviourContext((AnimatorEventSMB) target);
-
-		Type animatorWindowType = Type.GetType("UnityEditor.Graphs.AnimatorControllerTool, UnityEditor.Graphs");
-		var window = EditorWindow.GetWindow(animatorWindowType);
-		//var animatorField = animatorWindowType.GetField("m_PreviewAnimator", BindingFlags.Instance | BindingFlags.NonPublic);
-		//animator = animatorField.GetValue(window) as Animator;
-		var controllerField = animatorWindowType.GetField("m_AnimatorController", BindingFlags.Instance | BindingFlags.NonPublic);
-		controller = controllerField.GetValue(window) as UnityEditor.Animations.AnimatorController;
-
+		ScrubAnimatorUtil.GetCurrentAnimatorAndController(out controller, out var _);
 
 		UpdateMatchingAnimatorEventList();
 
@@ -68,35 +58,15 @@ public class AnimatorEventSMBEditor : Editor {
 			(rect, index, isActive, isFocused) => {
 				var property = serializedObject.FindProperty("onNormalizedTimeReached").GetArrayElementAtIndex(index);
 
-				float timeBefore = property.FindPropertyRelative("normalizedTime").floatValue;
-
 				DrawCallbackField(rect, property);
-				bool timeEdited = EditorGUI.PropertyField(new Rect(rect.x, rect.y + 20, rect.width, 20), property.FindPropertyRelative("normalizedTime"));
-				EditorGUI.PropertyField(new Rect(rect.x, rect.y + 40, rect.width / 2, 20), property.FindPropertyRelative("repeat"));
-				EditorGUI.PropertyField(new Rect(rect.x + rect.width / 2, rect.y + 40, rect.width / 2, 20), property.FindPropertyRelative("executeOnExitEnds"));
 
-				float timeNow = property.FindPropertyRelative("normalizedTime").floatValue;
+				rect.y += 20;
 
-				if (timeBefore != timeNow) {
-					UpdateMatchingAnimatorEventList();
-
-					if (!AnimationMode.InAnimationMode())
-						AnimationMode.StartAnimationMode();
-
-					foreach (var context in contexts) {
-						AnimatorState state = context.animatorObject as AnimatorState;
-						if (null == state) continue;
-
-						AnimationClip previewClip = GetFirstAvailableClip(state.motion);
-						if (null == previewClip) continue;
-
-						foreach (var targetObj in matchingAnimatorEvent) {
-							AnimationMode.BeginSampling();
-							AnimationMode.SampleAnimationClip(targetObj.gameObject, previewClip, property.FindPropertyRelative("normalizedTime").floatValue * previewClip.length);
-							AnimationMode.EndSampling();
-						}
-					}
-				}
+				ScrubAnimatorUtil.DrawScrub(rect,
+					(StateMachineBehaviour) target,
+					property.FindPropertyRelative("normalizedTime"),
+					property.FindPropertyRelative("repeat"),
+					property.FindPropertyRelative("executeOnExitEnds"));
 			});
 	}
 
@@ -132,28 +102,6 @@ public class AnimatorEventSMBEditor : Editor {
 				}
 			}
 		}
-	}
-
-	private AnimationClip GetFirstAvailableClip(Motion motion) {
-		if (motion is AnimationClip clip)
-			return clip;
-
-		if (motion is BlendTree tree) {
-			foreach (ChildMotion childMotion in tree.children) {
-				// Should we be worried about `cycleOffset`? https://docs.unity3d.com/ScriptReference/Animations.AnimatorState-cycleOffset.html
-
-				var child = childMotion.motion;
-				if (child is BlendTree childBlendTree) {
-					var childClip = GetFirstAvailableClip(childBlendTree);
-					if (childClip != null)
-						return childClip;
-				}
-				else if (child is AnimationClip childClip)
-					return childClip;
-			}
-		}
-
-		return null;
 	}
 
 	private void DrawCallbackField(Rect rect, SerializedProperty property) {

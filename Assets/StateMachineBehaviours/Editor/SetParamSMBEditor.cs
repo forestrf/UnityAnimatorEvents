@@ -11,34 +11,16 @@ public class SetParamSMBEditor : Editor {
 		//serializedObject.ShowScriptInput();
 		serializedObject.Update();
 
+		var when = serializedObject.FindProperty("when");
+		var what = serializedObject.FindProperty("what");
+		var paramName = serializedObject.FindProperty("paramName");
+
 		if (null == animatorController) {
-			contexts = AnimatorController.FindStateMachineBehaviourContext((SetParamSMB) target);
-			if (contexts == null) {
-				GUI.enabled = false;
-				EditorGUILayout.PropertyField(serializedObject.FindProperty("when"));
-				EditorGUILayout.PropertyField(serializedObject.FindProperty("paramName"));
-				switch ((AnimatorControllerParameterType) serializedObject.FindProperty("what").intValue) {
-					case AnimatorControllerParameterType.Bool:
-						EditorGUILayout.PropertyField(serializedObject.FindProperty("wantedBool"));
-						break;
-					case AnimatorControllerParameterType.Trigger:
-						EditorGUILayout.PropertyField(serializedObject.FindProperty("wantedBool"));
-						break;
-					case AnimatorControllerParameterType.Int:
-						EditorGUILayout.PropertyField(serializedObject.FindProperty("wantedInt"));
-						break;
-					case AnimatorControllerParameterType.Float:
-						EditorGUILayout.PropertyField(serializedObject.FindProperty("wantedFloat"));
-						break;
-				}
-				GUI.enabled = true;
-				return;
-			}
-			animatorController = contexts[0].animatorController;
+			ScrubAnimatorUtil.GetCurrentAnimatorAndController(out animatorController, out var _);
 		}
 		var parameters = animatorController.parameters;
 
-		var currentParamName = serializedObject.FindProperty("paramName").stringValue;
+		var currentParamName = paramName.stringValue;
 		bool paramFound = false;
 
 		GenericMenu menu = new GenericMenu();
@@ -47,13 +29,12 @@ public class SetParamSMBEditor : Editor {
 			if (elem.name == currentParamName) paramFound = true;
 		}
 
-
-		EditorGUILayout.PropertyField(serializedObject.FindProperty("when"));
+		EditorGUILayout.PropertyField(when);
 
 		GUILayout.BeginHorizontal();
 		var previousColor = GUI.color;
 		if (!paramFound) GUI.color = Color.red;
-		EditorGUILayout.PropertyField(serializedObject.FindProperty("paramName"));
+		EditorGUILayout.PropertyField(paramName);
 		GUI.color = previousColor;
 		if (EditorGUILayout.DropdownButton(GUIContent.none, FocusType.Keyboard, GUILayout.Width(16))) {
 			menu.ShowAsContext();
@@ -61,26 +42,50 @@ public class SetParamSMBEditor : Editor {
 		GUILayout.EndHorizontal();
 
 		foreach (var elem in parameters) {
-			if (elem.name == serializedObject.FindProperty("paramName").stringValue) {
-				serializedObject.FindProperty("what").intValue = (int) elem.type;
+			if (elem.name == paramName.stringValue) {
+				what.intValue = (int) elem.type;
 
-				switch ((AnimatorControllerParameterType) serializedObject.FindProperty("what").intValue) {
-					case AnimatorControllerParameterType.Bool:
-						EditorGUILayout.PropertyField(serializedObject.FindProperty("wantedBool"));
-						break;
-					case AnimatorControllerParameterType.Trigger:
-						EditorGUILayout.PropertyField(serializedObject.FindProperty("wantedBool"));
-						break;
-					case AnimatorControllerParameterType.Int:
-						EditorGUILayout.PropertyField(serializedObject.FindProperty("wantedInt"));
-						break;
-					case AnimatorControllerParameterType.Float:
-						EditorGUILayout.PropertyField(serializedObject.FindProperty("wantedFloat"));
-						break;
+				if (when.intValue == (int) SetParamSMB.When.WhileUpdating) {
+					EditorGUILayout.PropertyField(serializedObject.FindProperty("curve"));
+					EditorGUILayout.PropertyField(serializedObject.FindProperty("repeat"));
+
+					switch ((AnimatorControllerParameterType) what.intValue) {
+						case AnimatorControllerParameterType.Bool:
+						case AnimatorControllerParameterType.Trigger:
+							EditorGUILayout.HelpBox("True if the value is greater than 0", MessageType.Info);
+							break;
+						case AnimatorControllerParameterType.Int:
+							EditorGUILayout.HelpBox("Rounded to the nearest integer", MessageType.Info);
+							break;
+					}
+				}
+				else {
+					switch ((AnimatorControllerParameterType) what.intValue) {
+						case AnimatorControllerParameterType.Bool:
+							EditorGUILayout.PropertyField(serializedObject.FindProperty("wantedBool"));
+							break;
+						case AnimatorControllerParameterType.Trigger:
+							EditorGUILayout.PropertyField(serializedObject.FindProperty("wantedBool"));
+							break;
+						case AnimatorControllerParameterType.Int:
+							EditorGUILayout.PropertyField(serializedObject.FindProperty("wantedInt"));
+							break;
+						case AnimatorControllerParameterType.Float:
+							EditorGUILayout.PropertyField(serializedObject.FindProperty("wantedFloat"));
+							break;
+					}
 				}
 
 				break;
 			}
+		}
+
+		if (when.intValue == (int) SetParamSMB.When.OnNormalizedTimeReached) {
+			ScrubAnimatorUtil.DrawScrub(GUILayoutUtility.GetRect(0, 0, 40, 0),
+				(StateMachineBehaviour) target,
+				serializedObject.FindProperty("normalizedTime"),
+				serializedObject.FindProperty("repeat"),
+				serializedObject.FindProperty("executeOnExitEnds"));
 		}
 
 		serializedObject.ApplyModifiedProperties();
