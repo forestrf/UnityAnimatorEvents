@@ -5,6 +5,9 @@ using UnityEngine.Events;
 
 [RequireComponent(typeof(Animator))]
 public class AnimatorEvent : MonoBehaviour {
+	/// <summary>
+	/// List of events. This are set in the Editor. To add events in runtime, add them to <see cref="eventsById"/> instead of here.
+	/// </summary>
 	public EventElement[] events = new EventElement[0];
 	[Tooltip("Debug.Log calls to events. Only works in the Editor")]
 	public bool debug = false;
@@ -15,14 +18,16 @@ public class AnimatorEvent : MonoBehaviour {
 	/// <summary>
 	/// Events stored by its id. The id of an <see cref="EventElement"/> doesn't change after it's allocated.
 	/// </summary>
-	private Dictionary<int, EventElement> elementsDict = new Dictionary<int, EventElement>();
+	public readonly Dictionary<int, EventElement> eventsById = new Dictionary<int, EventElement>();
+	[HideInInspector]
+	public bool isEventsByIdReady { get; private set; }
 
 	public void CallEvent(int id) {
 #if UNITY_EDITOR
 		if (debug) Debug.Log("Event id: " + id);
 #endif
 		EventElement ev;
-		if (elementsDict.TryGetValue(id, out ev))
+		if (eventsById.TryGetValue(id, out ev))
 			queuedEvents.Add(ev);
 		else
 			Debug.LogError("Event id [" + id + "] not found", this);
@@ -30,7 +35,8 @@ public class AnimatorEvent : MonoBehaviour {
 
 	void Awake() {
 		foreach (var elem in events)
-			elementsDict.Add(elem.id, elem);
+			eventsById.Add(elem.id, elem);
+		isEventsByIdReady = true;
 	}
 
 	private void LateUpdate() {
