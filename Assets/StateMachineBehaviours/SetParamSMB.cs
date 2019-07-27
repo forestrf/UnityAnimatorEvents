@@ -52,8 +52,10 @@ public class SetParamSMB : StateMachineBehaviourExtended {
 				break;
 			case When.WhileUpdating:
 				var timeToEvaluate = stateInfo.normalizedTime;
-				Debug.Assert(curve.length > 0);
-				if (repeat) timeToEvaluate %= curve[curve.length - 1].time;
+				if (repeat) {
+					Debug.Assert(curve.length > 0);
+					timeToEvaluate %= curve[curve.length - 1].time;
+				}
 				float evaluatedCurve = curve.Evaluate(timeToEvaluate);
 				switch (what) {
 					case AnimatorControllerParameterType.Bool: animator.SetBool(paramName, evaluatedCurve > 0); break;
