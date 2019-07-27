@@ -164,7 +164,7 @@ public class AnimatorEventSMBEditor : Editor {
 		}
 		var ev = matchingAnimatorEvent[0].GetEventById(callbackIdProperty.intValue);
 		float idWidth = 120;
-		GUI.Label(new Rect(rect.x, rect.y, rect.width - idWidth, 18), ev != null ? ev.name : "<color=red><b>EVENT ID NOT FOUND</b></color>");
+		GUI.Label(new Rect(rect.x, rect.y, rect.width - idWidth, 18), ev != null ? ev.name : "<color=red><b>EVENT ID NOT FOUND</b></color>", eventNameStyle);
 		var prevLabelWidth = EditorGUIUtility.labelWidth;
 		EditorGUIUtility.labelWidth = 20;
 		EditorGUI.PropertyField(new Rect(rect.x + rect.width - idWidth, rect.y, idWidth, 18), callbackIdProperty, new GUIContent("ID ", "ID of the event. Change it manually only if needed."));
