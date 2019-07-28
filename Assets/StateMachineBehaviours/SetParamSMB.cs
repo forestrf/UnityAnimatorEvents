@@ -14,8 +14,9 @@ public class SetParamSMB : StateMachineBehaviourExtended {
 	// Variables used by OnNormalizedTimeReached
 	[Range(0, 1)]
 	public float normalizedTime;
-	[Tooltip("Execute as OnStateExitTransitionEnd if this hasn't been executed yet")]
-	public bool executeOnExitEnds;
+	[UnityEngine.Serialization.FormerlySerializedAs("executeOnExitEnds")]
+	public bool atLeastOnce;
+	public bool neverWhileExit;
 	[NonSerialized] public int nextNormalizedTime;
 
 	// Variables used by WhileUpdating
@@ -23,7 +24,6 @@ public class SetParamSMB : StateMachineBehaviourExtended {
 	public AnimationCurve curve;
 
 	// Variables used by OnNormalizedTimeReached and WhileUpdating
-	[Tooltip("Enable this to allow executing the logic every time the state loops. Otherwise it will only happen once.")]
 	public bool repeat;
 
 
@@ -38,6 +38,12 @@ public class SetParamSMB : StateMachineBehaviourExtended {
 	}
 	public override void StateExit_TransitionEnds(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
 		TryExecute(animator, When.OnStateExitTransitionEnds);
+
+		// Finalize events that want to execute on exit, and reset them for later
+		if (atLeastOnce && nextNormalizedTime == 0) {
+			TryExecuteNoCheck(animator);
+		}
+		nextNormalizedTime = 0;
 	}
 
 	public override void StateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {

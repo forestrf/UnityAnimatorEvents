@@ -64,7 +64,8 @@ public class AnimatorEventSMBEditor : Editor {
 					(StateMachineBehaviour) target,
 					property.FindPropertyRelative("normalizedTime"),
 					property.FindPropertyRelative("repeat"),
-					property.FindPropertyRelative("executeOnExitEnds"));
+					property.FindPropertyRelative("atLeastOnce"),
+					property.FindPropertyRelative("neverWhileExit"));
 			});
 	}
 

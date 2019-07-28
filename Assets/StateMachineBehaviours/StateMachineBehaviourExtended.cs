@@ -20,7 +20,7 @@ public abstract class StateMachineBehaviourExtended : StateMachineBehaviour {
 	public sealed override void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) { }
 	public sealed override void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller) { }
 
-	private enum State {
+	public enum State {
 		NotPaying,
 		EnteredTransitioning,
 		Updating,
@@ -30,6 +30,8 @@ public abstract class StateMachineBehaviourExtended : StateMachineBehaviour {
 	private State stateCur = State.NotPaying;
 	private State statePrev = State.NotPaying;
 	private int transitionHash;
+
+	public State currentState => stateCur;
 
 	public sealed override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
 		//Debug.Log("(" + Time.frameCount + ") " + debugName + " Start");

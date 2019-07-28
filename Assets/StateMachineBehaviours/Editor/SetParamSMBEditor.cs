@@ -86,7 +86,8 @@ public class SetParamSMBEditor : Editor {
 				(StateMachineBehaviour) target,
 				serializedObject.FindProperty("normalizedTime"),
 				serializedObject.FindProperty("repeat"),
-				serializedObject.FindProperty("executeOnExitEnds"));
+				serializedObject.FindProperty("atLeastOnce"),
+				serializedObject.FindProperty("neverWhileExit"));
 		}
 
 		serializedObject.ApplyModifiedProperties();

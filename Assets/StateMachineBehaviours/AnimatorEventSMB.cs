@@ -25,8 +25,9 @@ public class AnimatorEventSMB : StateMachineBehaviourExtended {
 		public string callback;
 		public int callbackId;
 		public bool repeat;
-		[Tooltip("Execute as OnStateExitTransitionEnd if this hasn't been executed yet")]
-		public bool executeOnExitEnds;
+		[UnityEngine.Serialization.FormerlySerializedAs("executeOnExitEnds")]
+		public bool atLeastOnce;
+		public bool neverWhileExit;
 		[NonSerialized] public int nextNormalizedTime;
 	}
 
@@ -45,9 +46,9 @@ public class AnimatorEventSMB : StateMachineBehaviourExtended {
 	public override void StateExit_TransitionEnds(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
 		FireTimedEvents(animator, onStateExitTransitionEnd);
 
-		// Finalize events that want to execute on end, and reset them for later
+		// Finalize events that want to execute on exit, and reset them for later
 		for (int i = 0; i < onNormalizedTimeReached.Length; i++) {
-			if (onNormalizedTimeReached[i].executeOnExitEnds && onNormalizedTimeReached[i].nextNormalizedTime == 0) {
+			if (onNormalizedTimeReached[i].atLeastOnce && onNormalizedTimeReached[i].nextNormalizedTime == 0) {
 				if (onNormalizedTimeReached[i].callbackId == 0) {
 					ShowIdWarning();
 					onNormalizedTimeReached[i].callbackId = Animator.StringToHash(onNormalizedTimeReached[i].callback);
@@ -67,6 +68,7 @@ public class AnimatorEventSMB : StateMachineBehaviourExtended {
 			GetAnimatorEvent(animator).CallEvent(onStateUpdated[i].callbackId);
 		}
 		for (int i = 0; i < onNormalizedTimeReached.Length; i++) {
+			if (onNormalizedTimeReached[i].neverWhileExit && currentState == State.ExitTransitioning) continue;
 			if (stateInfo.normalizedTime >= onNormalizedTimeReached[i].normalizedTime + onNormalizedTimeReached[i].nextNormalizedTime) {
 				if (onNormalizedTimeReached[i].callbackId == 0) {
 					ShowIdWarning();

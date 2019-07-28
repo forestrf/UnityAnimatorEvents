@@ -25,7 +25,7 @@ public static class ScrubAnimatorUtil {
 	/// <summary>
 	/// Draw a timeline that can be scrubbed to allow picking a specific normalized time of an animation
 	/// </summary>
-	public static void DrawScrub(Rect rect, StateMachineBehaviour target, SerializedProperty normalizedTime, SerializedProperty repeat, SerializedProperty executeOnExitEnds) {
+	public static void DrawScrub(Rect rect, StateMachineBehaviour target, SerializedProperty normalizedTime, SerializedProperty repeat, SerializedProperty atLeastOnce, SerializedProperty neverWhileExit) {
 		bool updatePreview = false;
 		float timeBefore = normalizedTime.floatValue;
 		GUI.Label(new Rect(rect.x, rect.y, 50, 20), "Time");
@@ -33,8 +33,10 @@ public static class ScrubAnimatorUtil {
 		if (GUI.Button(new Rect(rect.x + rect.width - 40, rect.y, 40, 20), "View")) {
 			updatePreview = true;
 		}
-		EditorGUI.PropertyField(new Rect(rect.x, rect.y + 20, rect.width / 2, 20), repeat);
-		EditorGUI.PropertyField(new Rect(rect.x + rect.width / 2, rect.y + 20, rect.width / 2, 20), executeOnExitEnds);
+
+		DrawSmallProperty(new Rect(rect.x, rect.y + 20, rect.width / 3f, 20), new GUIContent("Loop", "Enable this to allow execution every time the state loops. Otherwise it will only happen once."), repeat);
+		DrawSmallProperty(new Rect(rect.x + rect.width / 3f, rect.y + 20, rect.width / 3f, 20), new GUIContent("At Least Once", "Execute when the exit transition ends if this hasn't been executed yet."), atLeastOnce);
+		DrawSmallProperty(new Rect(rect.x + rect.width * 2f / 3f, rect.y + 20, rect.width / 3f, 20), new GUIContent("Never While Exit", "Prevent executing during the exit transition."), neverWhileExit);
 
 		if (timeBefore != normalizedTime.floatValue) updatePreview = true;
 
@@ -60,6 +62,11 @@ public static class ScrubAnimatorUtil {
 				AnimationMode.EndSampling();
 			}
 		}
+	}
+
+	private static void DrawSmallProperty(Rect rect, GUIContent content, SerializedProperty property) {
+		EditorGUIUtility.labelWidth = GUI.skin.label.CalcSize(content).x;
+		EditorGUI.PropertyField(rect, property, content);
 	}
 
 	private static AnimationClip GetFirstAvailableClip(Motion motion) {
