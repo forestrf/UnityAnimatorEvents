@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -41,8 +42,14 @@ public class AnimatorEventEditor : Editor {
 		if (GUILayout.Button("Add")) {
 			Undo.RecordObject(target, "Added event");
 			List<AnimatorEvent.EventElement> evs = new List<AnimatorEvent.EventElement>(((AnimatorEvent) target).events);
+			
+			// Avoid any collision of id.
+			int idCandidate = Random.Range(int.MinValue, int.MaxValue);
+			while(evs.Exists(e => e.id == idCandidate))
+				idCandidate++;
+
 			evs.Add(new AnimatorEvent.EventElement() {
-				id = Random.Range(int.MinValue, int.MaxValue),
+				id = idCandidate,
 				name = ""
 			});
 			((AnimatorEvent) target).events = evs.ToArray();
