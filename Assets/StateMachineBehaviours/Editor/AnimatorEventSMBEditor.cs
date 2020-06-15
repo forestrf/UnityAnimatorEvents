@@ -110,13 +110,17 @@ namespace Ashkatchap.AnimatorEvents {
 		}
 
 		private void DrawCallbackField(Rect rect, SerializedProperty property) {
+			const float idWidth = 120;
 			var callbackProperty = property.FindPropertyRelative("callback");
 			var callbackIdProperty = property.FindPropertyRelative("callbackId");
 			if (callbackIdProperty.intValue == 0) {
 				callbackIdProperty.intValue = Animator.StringToHash(callbackProperty.stringValue);
 			}
+			if (matchingAnimatorEvent.Count == 0) {
+				GUI.Label(new Rect(rect.x, rect.y, rect.width - idWidth, 18), "<color=red><b>No AnimatorEvent component found</b></color>", eventNameStyle);
+				return;
+			}
 			var ev = matchingAnimatorEvent[0].GetEventById(callbackIdProperty.intValue);
-			float idWidth = 120;
 			GUI.Label(new Rect(rect.x, rect.y, rect.width - idWidth, 18), ev != null ? ev.name : "<color=red><b>EVENT ID NOT FOUND</b></color>", eventNameStyle);
 			var prevLabelWidth = EditorGUIUtility.labelWidth;
 			EditorGUIUtility.labelWidth = 20;
