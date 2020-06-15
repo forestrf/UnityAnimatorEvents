@@ -4,7 +4,9 @@ This asset provides the ability to call UnityEvents stored in a script added nex
 
 This can be useful for things from easily adding events like footsteps to controlling how a character works by using the Animator like a state machine, blocking and unblocking the character's input, enabling and disabling rootmotion at certain points and much more.
 
-This asset was later rewritten and published to the asset store with more features https://assetstore.unity.com/packages/tools/animation/animator-events-169047
+This asset was later rewritten and published to the asset store with more features:
+- https://assetstore.unity.com/packages/tools/animation/animator-events-169047
+- https://ashkatchap.itch.io/unity-animator-events-v2
 
 ## How to use
 
