@@ -8,6 +8,8 @@ This asset was later rewritten and published to the asset store with more featur
 - https://assetstore.unity.com/packages/tools/animation/animator-events-169047
 - https://ashkatchap.itch.io/unity-animator-events-v2
 
+Made for and heavily used in the game Genokids https://genokids.com/
+
 ## How to use
 
 First, add the component `AnimatorEvent` to the GameObject that has the Animator that has the AnimatorController in question, and add events to it.
