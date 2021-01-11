@@ -7,6 +7,7 @@ This can be useful for things from easily adding events like footsteps to contro
 This asset was later rewritten and published to the asset store with more features:
 - https://assetstore.unity.com/packages/tools/animation/animator-events-169047
 - https://ashkatchap.itch.io/unity-animator-events-v2
+- Support and more for the new asset (not this one): https://discord.gg/WyxYWPCG7F​
 
 Made for and heavily used in the game Genokids https://genokids.com/
 
